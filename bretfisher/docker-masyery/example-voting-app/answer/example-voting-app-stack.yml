@@ -19,7 +19,7 @@ services:
     networks:
       - frontend
   db:
-    image: postgres:9.6
+    image: postgres:12-bullseye
     healthcheck:
       test: ["CMD", "postgres-healthcheck"]
       interval: 5s

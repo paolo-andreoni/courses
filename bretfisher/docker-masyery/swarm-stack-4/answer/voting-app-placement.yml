@@ -6,14 +6,24 @@
 # vote must not run on Swarm manager nodes
 # worker needs to scale with Swarm worker nodes, 1 task each
 
-version: '3'
+version: '3.9'
 services:
+    viz:
+      image: bretfisher/visualizer
+      volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+      ports:
+          - "8080:8080"
+      deploy:
+          placement:
+              constraints:
+                  - node.role == manager
     redis:
         image: redis:alpine
         networks:
             - frontend
     db:
-        image: postgres:9.6
+        image: postgres
         volumes:
             - 'db-data:/var/lib/postgresql/data'
         networks:
@@ -24,6 +34,7 @@ services:
             placement:
                 constraints:
                     - node.labels.ssd == true
+#                    - node.role == manager
     vote:
         image: bretfisher/examplevotingapp_vote
         ports:
@@ -46,11 +57,6 @@ services:
         networks:
             - frontend
             - backend
-        deploy:
-            mode: global
-            placement:
-                constraints:
-                    - node.role == worker
 networks:
     frontend: null
     backend: null
